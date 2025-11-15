@@ -4,10 +4,9 @@ Proyek Game Tic-Tac-Toe
 
 Proyek ini adalah implementasi dari game Tic-Tac-Toe online yang menggunakan model Client-Server dengan WebSocket dan sistem matchmaking berbasis peringkat (Rank/RR).
 
-1. Anggota Kelompok
-Daud Aldo S (NIM: 223400019)
-
-Foris Juniawan Hulu (NIM: 223400015)
+1. Anggota Kelompok :
+   - Foris Juniawan Hulu (NIM: 223400015)
+   - Daud Aldo S (NIM: 223400019)
 
 2. Deskripsi Aplikasi
 Aplikasi ini adalah game Tic-Tac-Toe multiplayer real-time yang dibangun dengan backend Go (Golang) dan frontend HTML/CSS/JavaScript. Komunikasi antara klien (browser) dan server dijembatani oleh WebSocket.
