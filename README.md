@@ -1,6 +1,6 @@
-_#UTS-Pemograman-Jaringan-PEMJAR-#_
+**_#UTS-Pemograman-Jaringan-PEMJAR-#_**
 
-_Proyek Game Tic-Tac-Toe_
+**_Proyek Game Tic-Tac-Toe_**
 
 Proyek ini adalah implementasi dari game Tic-Tac-Toe online yang menggunakan model Client-Server dengan WebSocket dan sistem matchmaking berbasis peringkat (Rank/RR).
 
