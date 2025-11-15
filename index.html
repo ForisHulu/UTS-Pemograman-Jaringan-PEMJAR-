@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Tic-Tac-Toe</h1>
+
+    <div id="rank-display" class="hidden">
+        <span id="rank-name">Bronze</span>
+        <span id="rank-rr">(100 RR)</span>
+        <span id="rank-change"></span>
+    </div>
+
+    <h2 id="status">Klik "Cari Game" untuk mulai!</h2>
+
+    <div id="connect-menu">
+        <button id="connect-button">Cari Game</button>
+    </div>
+
+    <!-- GRID SELALU ADA, HANYA DISEMBUNYIKAN -->
+    <div id="board">
+        <div class="row">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+        </div>
+        <div class="row">
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+        </div>
+        <div class="row">
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+    </div>
+
+    <div id="game-over-menu" class="hidden">
+        <button id="rematch-button">Continue (Rematch)</button>
+        <button id="search-button">Search for More</button>
+        <button id="quit-button">Quit</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const status = document.getElementById("status");
+            const connectMenu = document.getElementById("connect-menu");
+            const connectBtn = document.getElementById("connect-button");
+            const board = document.getElementById("board");
+            const gameOver = document.getElementById("game-over-menu");
+            const rematchBtn = document.getElementById("rematch-button");
+            const searchBtn = document.getElementById("search-button");
+            const quitBtn = document.getElementById("quit-button");
+            const cells = document.querySelectorAll(".cell");
+
+            const rankDisplay = document.getElementById("rank-display");
+            const rankName = document.getElementById("rank-name");
+            const rankRR = document.getElementById("rank-rr");
+            const rankChange = document.getElementById("rank-change");
+
+            let mySymbol = "";
+            let ws = null;
+
+            // RANK DISIMPAN DI LOCALSTORAGE
+            let playerRR = parseInt(localStorage.getItem("playerRR")) || 100;
+            let playerRank = localStorage.getItem("playerRank") || "Bronze";
+
+            function updateRankDisplay() {
+                rankName.textContent = playerRank;
+                rankRR.textContent = `(${playerRR} RR)`;
+                rankDisplay.classList.remove("hidden");
+            }
+
+            function connect() {
+                if (ws) ws.close();
+                ws = new WebSocket("ws://" + location.host + "/ws");
+
+                ws.onopen = () => {
+    console.log("Terhubung ke server");
+    // Kirim RR yang tersimpan di localStorage
+    const savedRR = localStorage.getItem("playerRR");
+    const rrToSend = savedRR ? parseInt(savedRR) : defaultRR;
+    ws.send(JSON.stringify({
+        type: "set_rr",
+        rr: rrToSend
+    }));
+};
+
+                ws.onclose = () => {
+                    status.textContent = "Koneksi terputus. Klik 'Cari Game' lagi.";
+                    connectMenu.classList.remove("hidden");
+                    board.classList.add("locked");
+                    gameOver.classList.add("hidden");
+                };
+
+                ws.onmessage = (e) => {
+                    const msg = JSON.parse(e.data);
+
+                    rankChange.textContent = "";
+                    rankChange.classList.remove("gain", "loss");
+
+                    if (["start", "update", "wait"].includes(msg.type)) {
+                        gameOver.classList.add("hidden");
+                        rematchBtn.disabled = false;
+                    }
+
+                    switch (msg.type) {
+                        case "rank_info":
+                            playerRank = msg.rankName;
+                            playerRR = msg.rr;
+                            localStorage.setItem("playerRR", playerRR);
+                            localStorage.setItem("playerRank", playerRank);
+                            updateRankDisplay();
+                            ws.send(JSON.stringify({ type: "join" }));
+                            break;
+
+                        case "wait":
+                            status.textContent = "Mencari lawan...";
+                            board.classList.remove("hidden", "locked");
+                            clearBoard();
+                            break;
+
+                        case "start":
+                            mySymbol = msg.symbol;
+                            status.textContent = `Anda: ${mySymbol} | Giliran: ${msg.turn}`;
+                            board.classList.remove("hidden", "locked");
+                            updateBoard(msg.board);
+                            enableMyTurn(msg.turn === mySymbol);
+                            break;
+
+                        case "update":
+                            status.textContent = `Giliran: ${msg.turn}`;
+                            updateBoard(msg.board);
+                            enableMyTurn(msg.turn === mySymbol);
+                            break;
+
+                        case "winner":
+                        case "draw":
+                            const result = msg.type === "winner"
+                                ? `Pemenang: ${msg.winner}!`
+                                : "Seri!";
+                            status.textContent = result + " Main lagi?";
+                            gameOver.classList.remove("hidden");
+                            board.classList.add("locked");
+                            updateBoard(msg.board);
+                            break;
+
+                        case "rank_update":
+                            playerRank = msg.rankName;
+                            playerRR = msg.rr;
+                            localStorage.setItem("playerRR", playerRR);
+                            localStorage.setItem("playerRank", playerRank);
+                            updateRankDisplay();
+
+                            const ch = msg.change > 0 ? `+${msg.change}` : msg.change;
+                            rankChange.textContent = `(${ch})`;
+                            rankChange.classList.add(msg.change > 0 ? "gain" : "loss");
+                            break;
+
+                        case "rematch_status":
+                            const [x, o] = msg.rematch_status;
+                            const me = mySymbol === "X" ? (x ? "Setuju" : "Belum") : (o ? "Setuju" : "Belum");
+                            const opp = mySymbol === "X" ? (o ? "Setuju" : "Belum") : (x ? "Setuju" : "Belum");
+                            status.textContent = `Rematch: Anda: ${me} | Lawan: ${opp}`;
+                            break;
+                    }
+                };
+            }
+
+            function clearBoard() {
+                cells.forEach(cell => cell.textContent = "");
+            }
+
+            function updateBoard(boardData) {
+                boardData.forEach((val, i) => {
+                    cells[i].textContent = val;
+                });
+            }
+
+            function enableMyTurn(isMyTurn) {
+                board.classList.toggle("locked", !isMyTurn);
+            }
+
+            cells.forEach(cell => {
+                cell.onclick = () => {
+                    if (ws && ws.readyState === WebSocket.OPEN && !board.classList.contains("locked")) {
+                        const pos = parseInt(cell.dataset.index);
+                        ws.send(JSON.stringify({ type: "move", position: pos }));
+                    }
+                };
+            });
+
+            connectBtn.onclick = () => {
+                status.textContent = "Mencari game...";
+                connectMenu.classList.add("hidden");
+                connect();
+            };
+
+            rematchBtn.onclick = () => {
+                ws.send(JSON.stringify({ type: "rematch" }));
+                status.textContent = "Menunggu lawan...";
+                rematchBtn.disabled = true;
+            };
+
+            searchBtn.onclick = () => {
+                ws.close();
+                status.textContent = "Mencari lawan baru...";
+                connectMenu.classList.add("hidden");
+                connect();
+            };
+
+            quitBtn.onclick = () => {
+                ws.close();
+                status.textContent = "Terima kasih telah bermain!";
+                connectMenu.classList.add("hidden");
+                gameOver.classList.add("hidden");
+                board.classList.add("hidden");
+                rankDisplay.classList.add("hidden");
+            };
+
+            // Tampilkan rank saat buka halaman
+            if (playerRR > 100 || playerRank !== "Bronze") {
+                updateRankDisplay();
+            }
+        });
+    </script>
+</body>
+</html>

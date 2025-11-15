@@ -1,14 +1,16 @@
-# UTS-Pemograman-Jaringan-PEMJAR-
-
 Proyek Game Tic-Tac-Toe
 
 Proyek ini adalah implementasi dari game Tic-Tac-Toe online yang menggunakan model Client-Server dengan WebSocket dan sistem matchmaking berbasis peringkat (Rank/RR).
 
-1. Anggota Kelompok :
-   - Foris Juniawan Hulu (NIM: 223400015)
-   - Daud Aldo S (NIM: 223400019)
+1. Anggota Kelompok
+
+Daud Aldo S (NIM: 223400019)
+
+Foris Juniawan Hulu (NIM: 223400015)
+
 
 2. Deskripsi Aplikasi
+
 Aplikasi ini adalah game Tic-Tac-Toe multiplayer real-time yang dibangun dengan backend Go (Golang) dan frontend HTML/CSS/JavaScript. Komunikasi antara klien (browser) dan server dijembatani oleh WebSocket.
 
 Fitur Utama:
@@ -25,7 +27,9 @@ Sistem Peringkat (Rank): RR pemain akan bertambah saat menang dan berkurang saat
 
 Komunikasi Real-time: Seluruh status game (pergerakan, giliran, status menang/kalah, rematch) dikirim dari server ke klien secara instan menggunakan WebSocket.
 
-4. Petunjuk Cara Menjalankan Aplikasi
+
+3. Petunjuk Cara Menjalankan Aplikasi
+
 Prasyarat (Prerequisites)
 
 Go (Golang) (versi 1.18 atau lebih baru)
@@ -36,7 +40,8 @@ Setup (Instalasi Dependensi)
 
 Aplikasi ini memerlukan paket gorilla/websocket dari Go. Untuk menginstalnya, buka terminal dan jalankan:
 
-go get github.com/gorilla/websocket
+go get [github.com/gorilla/websocket](https://github.com/gorilla/websocket)
+
 
 Menjalankan Server (Run)
 
@@ -48,36 +53,47 @@ Jalankan server Go dengan perintah:
 
 go run main.go
 
+
 Jika berhasil, server akan berjalan dan Anda akan melihat pesan di terminal:
 
 Server Matchmaking (v4.3 - FINAL FIX) dimulai di http://localhost:8080
 
+
 Memulai Game (Akses Aplikasi)
 
-Buka browser web Anda dan kunjungi alamat: http://localhost:8080
+Buka browser web Anda dan kunjungi alamat:
+http://localhost:8080
 
 Untuk menguji mode multiplayer, buka dua tab browser (atau dua browser yang berbeda, misal Chrome dan Safari) dan arahkan keduanya ke alamat http://localhost:8080.
 
 Klik tombol "Cari Game" di kedua tab tersebut untuk memulai proses matchmaking.
 
+
 4. Cuplikan Tampilan / Interaksi
+
 Berikut adalah contoh alur interaksi aplikasi:
 
-1. Lobi / Menu Utama Pemain melihat status dan tombol "Cari Game". Jika pemain sudah pernah bermain, peringkat (RR) mereka dari sesi sebelumnya akan ditampilkan.
-<img width="611" height="336" alt="image" src="https://github.com/user-attachments/assets/28c3fa79-ba0a-478b-b50e-55eb250aa6d9" />
-<img width="608" height="334" alt="image" src="https://github.com/user-attachments/assets/07dbaf61-3184-4296-9542-2e4bb7062bca" />
+1. Lobi / Menu Utama
+Pemain melihat status dan tombol "Cari Game". Jika pemain sudah pernah bermain, peringkat (RR) mereka dari sesi sebelumnya akan ditampilkan.
+
+<img width="1680" height="929" alt="Screenshot 2025-11-16 at 01 48 03" src="https://github.com/user-attachments/assets/c7d58ebe-3a86-4da5-8544-0c3390536188" />
+<img width="1680" height="929" alt="Screenshot 2025-11-16 at 01 50 20" src="https://github.com/user-attachments/assets/928db709-08c8-4962-a3c9-93d7aeaa958e" />
+
+2. Proses Matchmaking
+Setelah mengklik "Cari Game", server akan mencari lawan dengan RR yang sesuai.
+
+<img width="1680" height="929" alt="Screenshot 2025-11-16 at 01 51 44" src="https://github.com/user-attachments/assets/0980d79b-06dc-473e-9bd1-6e72e2975b38" />
+
+3. Game Berlangsung
+Kedua pemain dijodohkan. Papan permainan aktif dan pemain bisa bergantian menempatkan 'X' atau 'O'. Status giliran ditampilkan.
+
+<img width="1680" height="929" alt="Screenshot 2025-11-16 at 01 52 30" src="https://github.com/user-attachments/assets/069e4d85-b708-450b-bfb8-1bf4aa19085d" />
+<img width="1680" height="929" alt="Screenshot 2025-11-16 at 01 53 01" src="https://github.com/user-attachments/assets/55daeb49-8d7f-4ad8-ae43-b729152b6e9d" />
 
 
-2. Proses Matchmaking Setelah mengklik "Cari Game", server akan mencari lawan dengan RR yang sesuai.
-<img width="608" height="334" alt="image" src="https://github.com/user-attachments/assets/b6366713-5f1c-4b56-9360-39c4ca173878" />
+4. Hasil Permainan & Update Peringkat
+Setelah game selesai (Menang, Kalah, atau Seri), hasilnya akan ditampilkan. Poin RR pemain akan diperbarui dan ditampilkan di layar (misal: (+20) atau (-15)). Pemain kemudian dapat memilih untuk "Rematch" atau "Search for More".
 
-3. Game Berlangsung Kedua pemain dijodohkan. Papan permainan aktif dan pemain bisa bergantian menempatkan 'X' atau 'O'. Status giliran ditampilkan.
-<img width="608" height="337" alt="image" src="https://github.com/user-attachments/assets/4304c4ca-3fc7-4e38-bc9c-1a278a14dbcc" />
-<img width="610" height="331" alt="image" src="https://github.com/user-attachments/assets/ddd4b2fd-b196-499e-a5d5-eab841cbb18b" />
-
-
-4. Hasil Permainan & Update Peringkat Setelah game selesai (Menang, Kalah, atau Seri), hasilnya akan ditampilkan. Poin RR pemain akan diperbarui dan ditampilkan di layar (misal: (+20) atau (-15)). Pemain kemudian dapat memilih untuk "Rematch" atau "Search for More".
-<img width="607" height="335" alt="image" src="https://github.com/user-attachments/assets/9722279a-3fff-464a-90c2-93446372ee6f" />
-<img width="604" height="332" alt="image" src="https://github.com/user-attachments/assets/4e4f96bb-4d58-4dca-918d-a5f94a7b7c9c" />
-
+<img width="1680" height="929" alt="Screenshot 2025-11-16 at 01 54 39" src="https://github.com/user-attachments/assets/c9b82b57-615d-4f4c-8a28-a7100a619de1" />
+<img width="1680" height="929" alt="Screenshot 2025-11-16 at 01 55 03" src="https://github.com/user-attachments/assets/e47701b0-7a3c-4886-bb20-902abdac79e0" />
 
